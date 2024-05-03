@@ -19,3 +19,17 @@ source myenv/bin/activate
 ```
 jupyter notebook
 ```
+
+## Testing
+
+### Normal
+
+```
+pytest
+```
+
+### Watch Mode
+
+```
+ptw
+```
