@@ -20,6 +20,12 @@ source myenv/bin/activate
 jupyter notebook
 ```
 
+### Install Packages
+
+```
+pip install -r requirements.txt
+```
+
 ## Testing
 
 ### Normal
