@@ -3,3 +3,4 @@ pytest-watch
 pytest-mock
 numpy
 matplotlib
+opencv-python
