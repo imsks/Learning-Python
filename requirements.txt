@@ -4,3 +4,4 @@ pytest-mock
 numpy
 matplotlib
 opencv-python
+opencv-python-headless
