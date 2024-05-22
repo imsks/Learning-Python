@@ -6,3 +6,6 @@ matplotlib
 opencv-python
 opencv-python-headless
 cvzone
+requests
+urllib3==1.26.7
+pandas
