@@ -3,8 +3,6 @@ import requests
 
 # Call the API
 def make_api(url):
-    url = "https://www.amazon.in/dp/B0CX59H5W7"
-
     headers = {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36',
     }
@@ -23,21 +21,43 @@ def check_response(response):
 def scrape_news(html_content):
     soup = BeautifulSoup(html_content, 'html.parser')
 
-    # Product name
-    name_element = soup.find('span', id='productTitle')
-    if name_element:
-        name = name_element.text.strip()
-    else:
-        name = "Product name not found"
-    
-    # Product price
-    price_element = soup.find('span', class_='a-price-whole')
-    if price_element:
-        price = price_element.text.strip()[:-1]
-    else:
-        price = "Product price not found"
-    
+    # News name
+    name_elements = soup.find_all('div', class_='col_l_6')
+
+    titles = []
+    links = []
+    covers = []
+
+    for element in name_elements:
+        # Find the figcaption element within the current 'col_l_6' element
+        figcaption_element = element.find('figcaption')
+        # Extract caption text if the figcaption element exists
+        if figcaption_element:
+            title_text = figcaption_element.text.strip()
+            titles.append(title_text)
+        else:
+            titles.append("")
+
+        # Find the anchor tag (a element) within the 'yCs_c' class div
+        link_element = element.find('a') 
+        # Extract the 'href' attribute from the anchor tag if it exists
+        if link_element:
+            link = link_element.get('href')
+            links.append(link)
+        else:
+            links.append("")
+
+        # Find the img tag (img element)
+        cover_element = element.find('img') 
+        # Extract the 'src' attribute from the img tag if it exists
+        if cover_element:
+            cover = cover_element.get('data-src')
+            covers.append(cover)
+        else:
+            covers.append("")
+
     return {
-        "name": name,
-        "price": price
+        "titles": titles,
+        "links": links,
+        "covers": covers
     }
