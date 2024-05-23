@@ -19,8 +19,8 @@ def check_response(response):
         print("Error: ", response.status_code)
         return None
 
-# Scrap Produt Details
-def scrape_product_details(html_content):
+# Scrap News
+def scrape_news(html_content):
     soup = BeautifulSoup(html_content, 'html.parser')
 
     # Product name
