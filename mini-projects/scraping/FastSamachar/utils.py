@@ -23,6 +23,8 @@ class ScrapNews:
     def scrape_sources(self, html_content, source):
         if source == 'TOI':
             toi_news = self.scrape_TOI(html_content)
+        elif source == 'The Hindu':
+            toi_news = self.scrape_the_hindu(html_content)
 
         return [toi_news]
 
@@ -65,6 +67,51 @@ class ScrapNews:
 
         return {
             'source': 'TOI',
+            'titles': titles,
+            'links': links,
+            'covers': covers
+        }
+    
+    # Scrape The Hindu
+    def scrape_the_hindu(self, html_content):
+        soup = BeautifulSoup(html_content, 'html.parser')
+
+        # News name
+        name_elements = soup.find_all('div', class_='element')
+
+        titles = []
+        links = []
+        covers = []
+
+        for element in name_elements:
+            # Find the title element within the current 'col_l_6' element
+            title_element = element.find('h3')
+            # Extract caption text if the title element exists
+            if title_element:
+                title_text = title_element.text.strip()
+                titles.append(title_text)
+
+                # Find the anchor tag (a element) within the 'yCs_c' class div
+                link_element = element.find('a') 
+                # Extract the 'href' attribute from the anchor tag if it exists
+                if link_element:
+                    link = link_element.get('href')
+                    links.append(link)
+                else:
+                    links.append("")
+
+                # Find the img tag (img element)
+                cover_element = element.find('img', class_='media-object') 
+
+                # Extract the 'src' attribute from the img tag if it exists
+                if cover_element:
+                    cover = cover_element.get('data-src-template')
+                    covers.append(cover)
+                else:
+                    covers.append("")
+
+        return {
+            'source': 'The Hindu',
             'titles': titles,
             'links': links,
             'covers': covers
