@@ -44,26 +44,24 @@ class ScrapNews:
             if figcaption_element:
                 title_text = figcaption_element.text.strip()
                 titles.append(title_text)
-            else:
-                titles.append("")
 
-            # Find the anchor tag (a element) within the 'yCs_c' class div
-            link_element = element.find('a') 
-            # Extract the 'href' attribute from the anchor tag if it exists
-            if link_element:
-                link = link_element.get('href')
-                links.append(link)
-            else:
-                links.append("")
+                # Find the anchor tag (a element) within the 'yCs_c' class div
+                link_element = element.find('a') 
+                # Extract the 'href' attribute from the anchor tag if it exists
+                if link_element:
+                    link = link_element.get('href')
+                    links.append(link)
+                else:
+                    links.append("")
 
-            # Find the img tag (img element)
-            cover_element = element.find('img') 
-            # Extract the 'src' attribute from the img tag if it exists
-            if cover_element:
-                cover = cover_element.get('data-src')
-                covers.append(cover)
-            else:
-                covers.append("")
+                # Find the img tag (img element)
+                cover_element = element.find('img') 
+                # Extract the 'src' attribute from the img tag if it exists
+                if cover_element:
+                    cover = cover_element.get('data-src')
+                    covers.append(cover)
+                else:
+                    covers.append("")
 
         return {
             'source': 'TOI',
