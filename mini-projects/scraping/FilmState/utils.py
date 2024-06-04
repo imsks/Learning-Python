@@ -1,9 +1,33 @@
 import json
 from bs4 import BeautifulSoup
+from matplotlib import pyplot as plt
+import pandas as pd
 import requests
 
 # Scrap Class
 class ScrapeFilm:
+    def __init__(self, search_query, role):
+        self.search_query = search_query
+        self.role = role
+
+    # Init Scrapping
+    def init_scrapping(self):
+        response = self.make_imdb_suggestion_api()
+
+        parsed_celeb = self.parse_imdb_suggestion_response(response)
+
+        scrapped_celeb_details = self.scrape_celeb_details(parsed_celeb['id'])
+
+        celeb_filmography = self.get_celeb_filmography(scrapped_celeb_details)
+
+        df = pd.DataFrame(celeb_filmography[self.role])
+
+        return {
+            "celeb_name": parsed_celeb['l'],
+            "celeb_filmography": celeb_filmography,
+            "df": df
+        }
+
     # Call the API
     def make_api(self, url):
         headers = {
@@ -21,9 +45,9 @@ class ScrapeFilm:
             return None
 
     # Build IMDB Suggestion URL
-    def build_imdb_suggestion_url(self, search_query):
+    def build_imdb_suggestion_url(self):
         # Encode the search query for safe inclusion in the URL
-        encoded_query = requests.utils.quote(search_query)
+        encoded_query = requests.utils.quote(self.search_query)
         
         # Base URL for IMDB suggestion API
         base_url = "https://v3.sg.media-imdb.com/suggestion/x/"
@@ -40,8 +64,8 @@ class ScrapeFilm:
         return url
     
     # Make IMDB Suggestion API
-    def make_imdb_suggestion_api(self, search_query):
-        url = self.build_imdb_suggestion_url(search_query)
+    def make_imdb_suggestion_api(self):
+        url = self.build_imdb_suggestion_url()
         response = self.make_api(url)
         
         return self.check_response(response)
@@ -142,5 +166,22 @@ class ScrapeFilm:
             "ratings": ratings
         }
 
+class PlotFilm:
+    def __init__(self, df):
+        self.df = df
 
-       
+    def generate_scatter(self, celeb_name):
+        # Assuming your DataFrame is named 'df' and you want to plot ratings vs. year
+        plt.figure(figsize=(10, 6))  # Adjust figure size for better readability
+
+        df_sorted = self.df.sort_values(by="ratings", ascending=True)
+        for i, row in df_sorted.iterrows():
+            plt.scatter(row['titles'], row["ratings"], label=row["titles"])
+
+        plt.xlabel("Movie")
+        plt.ylabel("Rating")
+        plt.title(f"{celeb_name} Movies")
+        plt.legend(title="Movie Titles", loc='upper left', bbox_to_anchor=(1, 1))
+        plt.xticks(rotation=45)
+        plt.tight_layout()
+        plt.show()
