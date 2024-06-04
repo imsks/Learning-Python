@@ -33,9 +33,9 @@ class ScrapeFilm:
         
         return url
     
-    # Build Director URL
-    def build_diretor_url(self, director_id):
-        url = "https://www.imdb.com/name/" + director_id
+    # Build celeb URL
+    def build_celeb_url(self, celeb_id):
+        url = "https://www.imdb.com/name/" + celeb_id
         
         return url
     
@@ -61,33 +61,49 @@ class ScrapeFilm:
         # Return the first suggestion (assuming the list is not empty)
         return suggestions[index]
     
-    # Scrape Director Details
-    def scrape_director_details(self, director_id):
-        url = self.build_diretor_url(director_id)
+    # Scrape celeb Details
+    def scrape_celeb_details(self, celeb_id):
+        url = self.build_celeb_url(celeb_id)
         response = self.make_api(url)
         
         return response.content
-
-    # Process Director Details
-    def process_director_details(self, html_content):
+    
+    # Get Celeb Filmography
+    def get_celeb_filmography(self, html_content):
         soup = BeautifulSoup(html_content, 'html.parser')
+        
+        all_writer_elements = soup.find('div', id='accordion-item-writer-previous-projects')
+        all_producer_elements = soup.find('div', id='accordion-item-producer-previous-projects')
+        all_director_elements = soup.find('div', id='accordion-item-director-previous-projects')
+
+        writer_films = self.process_film_details(all_writer_elements)
+        producer_films = self.process_film_details(all_producer_elements)
+        director_films = self.process_film_details(all_director_elements)
+
+        return {
+            "writer": writer_films,
+            "producer": producer_films,
+            "director": director_films
+        }
+
+    # Process Film Details
+    def process_film_details(self, all_films_element):
+        if not all_films_element:
+            return {
+                "titles": [],
+                "links": [],
+                "covers": [],
+                "ratings": []
+            }
 
         titles = []
         links = []
         covers = []
         ratings = []
 
-        # # Product name
-        all_films_element = soup.find('div', id='accordion-item-director-previous-projects')
-        
         film_elements = all_films_element.find_all('li')
 
         for film_element in film_elements:
-            cover = film_element.find('img')
-
-            if cover:
-                covers.append(cover.get('src'))
-
             link = film_element.find('a', class_='ipc-metadata-list-summary-item__t')
 
             if link:
@@ -102,6 +118,24 @@ class ScrapeFilm:
 
                 if rating:
                     ratings.append(rating.text.strip())
+                else:
+                    ratings.append("") 
+
+                cover = film_element.find('img', class_='ipc-image')
+
+                if cover:
+                    covers.append(cover.get('src'))
+                else:
+                    covers.append("") 
+
+            
+
+        # Find the maximum length of any list
+        max_length = max(len(lst) for lst in [titles, links, covers, ratings])
+
+        # Pad shorter lists with empty strings
+        for lst in [titles, links, covers, ratings]:
+            lst.extend([""] * (max_length - len(lst)))
 
         return {
             "titles": titles,
@@ -109,5 +143,6 @@ class ScrapeFilm:
             "covers": covers,
             "ratings": ratings
         }
+
 
        
