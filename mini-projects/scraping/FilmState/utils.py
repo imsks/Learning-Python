@@ -128,8 +128,6 @@ class ScrapeFilm:
                 else:
                     covers.append("") 
 
-            
-
         # Find the maximum length of any list
         max_length = max(len(lst) for lst in [titles, links, covers, ratings])
 
